@@ -1,0 +1,23 @@
+@import "@fontsource/roboto/100.css";
+@import "@fontsource/roboto/300.css";
+@import "@fontsource/roboto/400.css";
+@import "@fontsource/roboto/500.css";
+@import "@fontsource/roboto/700.css";
+@import "@fontsource/inconsolata/400.css";
+@import "@fontsource/inconsolata/700.css";
+
+:root {
+    --font-regular: "Roboto", sans-serif;
+    --font-monospace: "Inconsolata", monospace;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-regular);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+    font-family: var(--font-monospace);
+}
