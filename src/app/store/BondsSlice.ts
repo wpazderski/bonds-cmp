@@ -9,8 +9,8 @@ export interface BondsState {
 const initialState: BondsState = {
     availableBonds: [
         {
-            id: "pl3mOTS102022",
-            name: "3m OTS 10.2022",
+            id: "pl3mOTS122022",
+            name: "3m OTS 12.2022",
             unitPrice: 100,
             capitalization: false,
             interestPeriods: [
@@ -24,8 +24,8 @@ const initialState: BondsState = {
             ],
         },
         {
-            id: "pl1yROR102022",
-            name: "1y ROR 10.2022",
+            id: "pl1yROR122022",
+            name: "1y ROR 12.2022",
             unitPrice: 100,
             capitalization: false,
             interestPeriods: [
@@ -46,8 +46,8 @@ const initialState: BondsState = {
             ],
         },
         {
-            id: "pl2yDOR102022",
-            name: "2y DOR 10.2022",
+            id: "pl2yDOR122022",
+            name: "2y DOR 12.2022",
             unitPrice: 100,
             capitalization: false,
             interestPeriods: [
@@ -68,8 +68,8 @@ const initialState: BondsState = {
             ],
         },
         {
-            id: "pl3yTOS102022",
-            name: "3y TOS 10.2022",
+            id: "pl3yTOS122022",
+            name: "3y TOS 12.2022",
             unitPrice: 100,
             capitalization: true,
             interestPeriods: [
@@ -83,8 +83,8 @@ const initialState: BondsState = {
             ],
         },
         {
-            id: "pl4yCOI102022",
-            name: "4y COI 10.2022",
+            id: "pl4yCOI122022",
+            name: "4y COI 12.2022",
             unitPrice: 100,
             capitalization: false,
             interestPeriods: [
@@ -105,8 +105,8 @@ const initialState: BondsState = {
             ],
         },
         {
-            id: "pl10yEDO102022",
-            name: "10y EDO 10.2022",
+            id: "pl10yEDO122022",
+            name: "10y EDO 12.2022",
             unitPrice: 100,
             capitalization: true,
             interestPeriods: [
