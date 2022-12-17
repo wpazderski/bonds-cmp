@@ -68,7 +68,7 @@ export function Chart(props: ChartProps) {
     
     const labels = useMemo(() => {
         const computedLabels = [];
-        const durationMonths = Utils.getDurationMonths(settings.investmentDuration);
+        const durationMonths = Utils.getDurationMonths(settings.investmentDuration) + 1;
         const dt = new Date();
         let m = dt.getMonth() + 1;
         let y = dt.getFullYear();

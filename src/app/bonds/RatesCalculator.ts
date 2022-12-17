@@ -10,6 +10,8 @@ export class RatesCalculator {
     private accumulatedMonthlyRates: number[];
     
     constructor(private rates: number[], private numYears: number, private options: RatesCalculatorOptions) {
+        this.numYears++;
+        this.rates = [...this.rates, this.rates[this.rates.length - 1]];
         this.annualRates = this.calculateAnnualRates();
         this.monthlyRates = this.calculateMonthlyRates();
         this.accumulatedAnnualRates = this.calculateAccumulatedAnnualRates();
