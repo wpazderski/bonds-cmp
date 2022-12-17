@@ -44,6 +44,9 @@ function App() {
             </header>
             <div className="App-content">
                 <Box>
+                    <Box className="disclaimer">
+                        {t("disclaimer")}
+                    </Box>
                     <Box sx={{ borderBottom: 1, borderColor: "divider", marginBottom: 3 }}>
                         <Tabs value={openTabId} onChange={handleChange}>
                             <Tab label={t("mainTabs.header.settings")} value={settingsTabId} />

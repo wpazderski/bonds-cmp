@@ -1,6 +1,8 @@
 {
     "appTitle": "Treasury bonds profitability",
     
+    "disclaimer": "This is not an investment recommendation. Computer programs may have bugs - always do your own calculations before investing.",
+    
     "mainTabs.header.settings": "Settings",
     "mainTabs.header.bonds": "Bonds",
     "mainTabs.header.charts": "Charts",

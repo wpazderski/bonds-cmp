@@ -1,6 +1,8 @@
 {
     "appTitle": "Opłacalność obligacji skarbowych",
     
+    "disclaimer": "To nie jest porada inwestycyjna. Programy komputerowe mogą mieć błędy - zawsze wykonaj własne obliczenia przed inwestowaniem.",
+    
     "mainTabs.header.settings": "Ustawienia",
     "mainTabs.header.bonds": "Obligacje",
     "mainTabs.header.charts": "Wykresy",
