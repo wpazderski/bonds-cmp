@@ -25,6 +25,10 @@ The tool was developed to help people answer the following question: "Which bond
 * This is not an investment recommendation.
 * Computer programs may have bugs - always do your own calculations before investing.
 
+## Demo
+* https://pazderski.dev/bonds/?lng=en
+* https://pazderski.dev/obligacje/?lng=pl
+
 ## Building and deployment
 ```
 git clone https://github.com/wpazderski/bonds-cmp.git
