@@ -1,6 +1,10 @@
 import { BondsState } from "./BondsSlice";
 import { SettingsState } from "./SettingsSlice";
 
+
+
+
+
 export interface ExportedData {
     bonds: BondsState;
     settings: SettingsState;
@@ -9,36 +13,23 @@ export interface ExportedData {
 export class ExportImport {
     
     private static LOCAL_STORAGE_KEY: string = "treasury-bonds-profitability-data";
-    private static initialized: boolean = false;
     
-    static ensureInitialized(importer: (data: ExportedData) => void): void {
-        if (this.initialized) {
-            return;
+    static readDataFromUrlOrLocalStorage(): ExportedData | null {
+        const fromUrl = this.readDataFromUrl();
+        if (fromUrl !== null) {
+            return fromUrl;
         }
-        this.initialized = true;
-        const fromUrl = this.importFromUrl();
-        const fromLocalStorage = this.importFromLocalStorage();
-        const data = fromUrl ?? fromLocalStorage;
-        if (!data) {
-            return;
-        }
-        importer(data);
+        const fromLocalStorage = this.readDataFromLocalStorage();
+        return fromLocalStorage;
     }
     
-    static saveToLocalStorage(data: ExportedData): void {
-        localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(data));
+    static async readFromFile(file: File): Promise<ExportedData> {
+        const resultStr = await file.text();
+        const result = JSON.parse(resultStr);
+        return result;
     }
     
-    static importFromLocalStorage(): ExportedData | null {
-        const dataStr = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-        return dataStr === null ? null : JSON.parse(dataStr);
-    }
-    
-    static removeFromLocalStorage(): void {
-        localStorage.removeItem(this.LOCAL_STORAGE_KEY);
-    }
-    
-    static async export(data: ExportedData): Promise<void> {
+    static async exportToFile(data: ExportedData): Promise<void> {
         const blob = new Blob([JSON.stringify(data)], { type: "text/json" });
         const url = window.URL.createObjectURL(blob);
         const el = document.createElement("a");
@@ -51,12 +42,6 @@ export class ExportImport {
         window.URL.revokeObjectURL(url);
     }
     
-    static async import(file: File): Promise<ExportedData> {
-        const resultStr = await file.text();
-        const result = JSON.parse(resultStr);
-        return result;
-    }
-    
     static exportToUrl(data: ExportedData): string {
         const dataStr = JSON.stringify(data);
         let url = window.location.href.split("#")[0];
@@ -64,7 +49,20 @@ export class ExportImport {
         return url;
     }
     
-    static importFromUrl(): ExportedData | null {
+    static saveDataToLocalStorage(data: ExportedData): void {
+        localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(data));
+    }
+    
+    static removeDataFromLocalStorage(): void {
+        localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+    }
+    
+    private static readDataFromLocalStorage(): ExportedData | null {
+        const dataStr = localStorage.getItem(this.LOCAL_STORAGE_KEY);
+        return dataStr === null ? null : JSON.parse(dataStr);
+    }
+    
+    private static readDataFromUrl(): ExportedData | null {
         try {
             const dataStr = decodeURIComponent(window.location.hash.substring(1));
             const data = JSON.parse(dataStr);
@@ -72,10 +70,6 @@ export class ExportImport {
         }
         catch {}
         return null;
-    }
-    
-    static async copyUrl(url: string): Promise<void> {
-        await navigator.clipboard.writeText(url);
     }
     
     private static getCurrentDateTimeString(): string {

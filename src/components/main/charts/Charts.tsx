@@ -1,6 +1,12 @@
-import { useTranslation } from "react-i18next";
-import { Chart } from "./chart/Chart";
 import "./Charts.scss";
+
+import { useTranslation } from "react-i18next";
+
+import { Chart } from "./chart/Chart";
+
+
+
+
 
 export function Charts() {
     const { t } = useTranslation();

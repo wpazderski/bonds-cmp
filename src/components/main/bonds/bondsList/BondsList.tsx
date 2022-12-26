@@ -1,30 +1,43 @@
-import { useEffect } from "react";
+import "./BondsList.scss";
+
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Divider from "@mui/material/Divider";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import IconButton from "@mui/material/IconButton";
-import Divider from "@mui/material/Divider";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { addAvailableBonds, removeAvailableBonds, selectAvailableBonds, useAppDispatch, useAppSelector } from "../../../../app/store";
+
+import {
+    addAvailableBonds,
+    removeAvailableBonds,
+    selectAvailableBonds,
+    useAppDispatch,
+    useAppSelector,
+} from "../../../../app/store";
 import { selectOpenBondsId, setOpenBondsId } from "../../../../app/store/UiSlice";
-import "./BondsList.scss";
+
+
+
+
 
 export function BondsList() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const availableBonds = useAppSelector(selectAvailableBonds);
     const openBondsId = useAppSelector(selectOpenBondsId);
-    const handleBondsClick = (bondsId: string) => {
-        dispatch(setOpenBondsId(bondsId));
-    };
-    const handleRemoveBondsClick = (bondsId: string) => {
-        dispatch(removeAvailableBonds(bondsId));
-    };
-    const handleAddBondsClick = () => {
+    
+    useEffect(() => {
+        if (availableBonds.length > 0 && !availableBonds.find(bonds => bonds.id === openBondsId)) {
+            dispatch(setOpenBondsId(availableBonds[0].id));
+        }
+    }, [availableBonds, dispatch, openBondsId]);
+    
+    const handleAddBondsClick = useCallback(() => {
         const newBondsId = Date.now().toString();
         dispatch(addAvailableBonds({
             id: newBondsId,
@@ -42,38 +55,24 @@ export function BondsList() {
             ],
         }));
         dispatch(setOpenBondsId(newBondsId));
-    };
-    useEffect(() => {
-        if (availableBonds.length > 0 && !availableBonds.find(bonds => bonds.id === openBondsId)) {
-            dispatch(setOpenBondsId(availableBonds[0].id));
-        }
-    }, [availableBonds, dispatch, openBondsId]);
+    }, [dispatch]);
   
     return (
         <div className="BondsList">
             <List>
-                {availableBonds.map(bonds => {
-                    return (
-                        <ListItem
-                            key={bonds.id}
-                            secondaryAction={
-                                <IconButton edge="end" onClick={() => handleRemoveBondsClick(bonds.id)}>
-                                    <FontAwesomeIcon icon={faTrash} className="BondsList__item-icon" />
-                                </IconButton>
-                            }
-                            disablePadding
-                        >
-                            <ListItemButton role={undefined} onClick={() => handleBondsClick(bonds.id)} selected={openBondsId === bonds.id}>
-                                <ListItemText primary={bonds.name} />
-                            </ListItemButton>
-                        </ListItem>
-                    );
-                })}
+                {availableBonds.map(bonds => (
+                    <BondsListItem
+                        key={bonds.id}
+                        id={bonds.id}
+                        name={bonds.name}
+                        isSelected={openBondsId === bonds.id}
+                    />
+                ))}
             </List>
             <Divider />
             <List>
                 <ListItem disablePadding>
-                    <ListItemButton role={undefined} onClick={() => handleAddBondsClick()}>
+                    <ListItemButton role={undefined} onClick={handleAddBondsClick}>
                         <ListItemIcon style={{minWidth:"28px"}}>
                             <FontAwesomeIcon icon={faPlus} className="BondsList__item-icon" />
                         </ListItemIcon>
@@ -82,5 +81,39 @@ export function BondsList() {
                 </ListItem>
             </List>
         </div>
+    );
+}
+
+interface BondsListItemProps {
+    id: string;
+    name: string;
+    isSelected: boolean;
+}
+
+function BondsListItem(props: BondsListItemProps) {
+    const dispatch = useAppDispatch();
+    
+    const handleBondsClick = useCallback(() => {
+        dispatch(setOpenBondsId(props.id));
+    }, [dispatch, props.id]);
+    
+    const handleRemoveBondsClick = useCallback(() => {
+        dispatch(removeAvailableBonds(props.id));
+    }, [dispatch, props.id]);
+    
+    return (
+        <ListItem
+            key={props.id}
+            secondaryAction={
+                <IconButton edge="end" onClick={handleRemoveBondsClick}>
+                    <FontAwesomeIcon icon={faTrash} className="BondsList__item-icon" />
+                </IconButton>
+            }
+            disablePadding
+        >
+            <ListItemButton role={undefined} onClick={handleBondsClick} selected={props.isSelected}>
+                <ListItemText primary={props.name} />
+            </ListItemButton>
+        </ListItem>
     );
 }

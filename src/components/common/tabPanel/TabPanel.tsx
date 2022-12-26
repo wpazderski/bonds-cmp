@@ -1,5 +1,9 @@
 import Box from "@mui/material/Box";
 
+
+
+
+
 export interface TabPanelProps {
     children?: React.ReactNode;
     isOpen: boolean;
@@ -13,6 +17,7 @@ export function TabPanel(props: TabPanelProps) {
             role="tabpanel"
             hidden={!isOpen}
             {...otherProps}
+            data-testid="TabPanel"
         >
             {isOpen && (
                 <Box sx={{ p: 3 }}>

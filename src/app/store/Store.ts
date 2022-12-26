@@ -1,13 +1,18 @@
-import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
+import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
+
 import bondsReducer from "./BondsSlice";
-import uiReducer from "./UiSlice";
 import settingsReducer from "./SettingsSlice";
+import uiReducer from "./UiSlice";
+
+
+
+
 
 export const store = configureStore({
     reducer: {
         bonds: bondsReducer,
-        ui: uiReducer,
         settings: settingsReducer,
+        ui: uiReducer,
     },
 });
 

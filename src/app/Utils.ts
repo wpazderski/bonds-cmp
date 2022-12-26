@@ -1,5 +1,9 @@
 import { Duration } from "./bonds/Types";
 
+
+
+
+
 export class Utils {
     
     static getDurationMonths(duration: Duration): number {
@@ -11,20 +15,10 @@ export class Utils {
         }
     }
     
-    static getDurationYears(duration: Duration, rounding: "up" | "down" | "halfpoint" | "none"): number {
+    static getDurationYears(duration: Duration): number {
         switch (duration.unit) {
             case "m":
-                const years = duration.num / 12;
-                if (rounding === "up") {
-                    return Math.ceil(years);
-                }
-                if (rounding === "down") {
-                    return Math.floor(years);
-                }
-                if (rounding === "halfpoint") {
-                    return Math.round(years);
-                }
-                return years;
+                return duration.num / 12;
             case "y":
                 return duration.num;
         }

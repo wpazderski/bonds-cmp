@@ -1,10 +1,11 @@
 {
     "name": "@wpazderski/bonds-cmp",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Tool for comparing profitability of treasury bonds",
     "author": "Witold Pazderski",
     "license": "MIT",
     "scripts": {
+        "test": "react-scripts test",
         "start": "react-scripts start",
         "build": "react-scripts build",
         "eject": "react-scripts eject"

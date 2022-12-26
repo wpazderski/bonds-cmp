@@ -3,16 +3,19 @@
     text-align: center;
     background: #404040;
     color: #fff;
+    
+    h1 {
+        font-size: 30px;
+        font-weight: 300;
+        margin: 0;
+    }
 }
-.App-header h1 {
-    font-size: 30px;
-    font-weight: 300;
-    margin: 0;
-}
+
 .App-content {
     margin: 50px auto;
     max-width: 1600px;
 }
+
 .disclaimer {
     color: #993333;
     margin-bottom: 20px;

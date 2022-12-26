@@ -1,12 +1,17 @@
-.Settings__form > * {
-    max-width: 400px;
+.Settings__form {
+    > * {
+        max-width: 400px;
+    }
+    
+    > .Settings__form__full-width {
+        max-width: unset;
+    }
 }
-.Settings__form > .Settings__form__full-width {
-    max-width: unset;
-}
+
 .Settings__separate-option {
     padding: 30px 0 10px 0;
 }
+
 .Settings_extra-info {
     color: #777;
     margin-top: 15px;

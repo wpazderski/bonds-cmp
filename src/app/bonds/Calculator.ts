@@ -1,20 +1,28 @@
 import { SettingsState } from "../store";
 import { Utils } from "../Utils";
+import { AccumulatedRatesCalculator } from "./AccumulatedRatesCalculator";
 import { RatesCalculator } from "./RatesCalculator";
 import { Bonds, CancellationPolicy, InterestRate } from "./Types";
+
+
+
+
 
 export class Calculator {
     
     private durationMonths: number;
     private durationYears: number;
     private inflationRatesCalculator: RatesCalculator;
+    private accumulatedInflationRatesCalculator: AccumulatedRatesCalculator;
     private referenceRatesCalculator: RatesCalculator;
     
     constructor(private bonds: Bonds, private settings: SettingsState) {
         this.durationMonths = Utils.getDurationMonths(settings.investmentDuration);
-        this.durationYears = Utils.getDurationYears(settings.investmentDuration, "up");
-        this.inflationRatesCalculator = new RatesCalculator(this.settings.inflationRates, this.durationYears, { useFirstRateAsBaseForAccumulatedRates: true });
-        this.referenceRatesCalculator = new RatesCalculator(this.settings.referenceRates, this.durationYears, { useFirstRateAsBaseForAccumulatedRates: false });
+        this.durationYears = Math.ceil(Utils.getDurationYears(settings.investmentDuration));
+        const ratesCalculationNumYears = this.durationYears + 1;
+        this.inflationRatesCalculator = new RatesCalculator(this.settings.inflationRates, ratesCalculationNumYears);
+        this.accumulatedInflationRatesCalculator = new AccumulatedRatesCalculator(this.inflationRatesCalculator, ratesCalculationNumYears);
+        this.referenceRatesCalculator = new RatesCalculator(this.settings.referenceRates, ratesCalculationNumYears);
     }
     
     calculate(onlyEarnings: boolean, adjustedForInflation: boolean): number[] {
@@ -48,7 +56,7 @@ export class Calculator {
     }
     
     private calculateTotalsAdjustedForInflation(totals: number[]): number[] {
-        return totals.map((total, i) => total / (1.0 + this.inflationRatesCalculator.getAccumulatedRateByMonth(i)));
+        return totals.map((total, i) => total / (1.0 + this.accumulatedInflationRatesCalculator.getAccumulatedRateByMonth(i)));
     }
     
     private calculateTotals(): number[] {

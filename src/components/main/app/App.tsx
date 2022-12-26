@@ -1,18 +1,24 @@
-import React, { useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import "./App.scss";
+
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
+import React, { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
+import { setBonds, setSettings, useAppDispatch, useAppSelector } from "../../../app/store";
+import { ExportImport as ExportImportUtils } from "../../../app/store/ExportImport";
+import { AppMainTabs, selectOpenTabId, setOpenTabId } from "../../../app/store/UiSlice";
 import { TabPanel } from "../../common/tabPanel/TabPanel";
 import { Bonds } from "../bonds/Bonds";
 import { Charts } from "../charts/Charts";
-import { setBonds, setSettings, useAppDispatch, useAppSelector } from "../../../app/store";
-import { selectOpenTabId, setOpenTabId, AppMainTabs } from "../../../app/store/UiSlice";
-import { Settings } from "../settings/Settings";
 import { ExportImport } from "../exportImport/ExportImport";
-import { ExportImport as ExportImportUtils } from "../../../app/store/ExportImport";
-import "./App.scss";
+import { Settings } from "../settings/Settings";
 import { LanguageSelector } from "./languageSelector/LanguageSelector";
+
+
+
+
 
 const settingsTabId: AppMainTabs = "settings";
 const bondsTabId: AppMainTabs = "bonds";
@@ -23,18 +29,22 @@ function App() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const openTabId = useAppSelector(selectOpenTabId);
-    const handleChange = (_event: React.SyntheticEvent, newSelectedTab: AppMainTabs) => {
+    
+    const handleChange = useCallback((_event: React.SyntheticEvent, newSelectedTab: AppMainTabs) => {
         dispatch(setOpenTabId(newSelectedTab));
-    };
+    }, [dispatch]);
+    
     useEffect(() => {
         document.title = t("appTitle");
     }, [t]);
+    
     useEffect(() => {
-        ExportImportUtils.ensureInitialized(data => {
+        const data = ExportImportUtils.readDataFromUrlOrLocalStorage();
+        if (data) {
             dispatch(setSettings(data.settings));
             dispatch(setBonds(data.bonds));
-        });
-    });
+        }
+    }, [dispatch]);
     
     return (
         <div className="App">

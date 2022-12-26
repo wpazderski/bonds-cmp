@@ -1,11 +1,17 @@
-import { useState } from "react";
+import "./LanguageSelector.scss";
+
+import ListItemIcon from "@mui/material/ListItemIcon";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import { GB, PL, US } from "country-flag-icons/react/3x2";
-import "./LanguageSelector.scss";
-import { defaultLang, availableLangs } from "../../../../app/i18n";
 import i18next from "i18next";
+import { useCallback, useState } from "react";
+
+import { availableLangs, defaultLang } from "../../../../app/i18n";
+
+
+
+
 
 function getCurrentLang(): string {
     const lang = localStorage.getItem("i18nextLng");
@@ -18,20 +24,36 @@ function getCurrentLang(): string {
 export function LanguageSelector() {
     const [currentLang, setCurrentLang] = useState(getCurrentLang());
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-    const handleMainButtonClick = (target: HTMLElement) => {
-        setAnchorEl(target);
-    };
-    const handleClose = () => {
+    
+    const handleMainButtonClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    }, []);
+    
+    const handleMenuClose = useCallback(() => {
         setAnchorEl(null);
-    };
-    const setLang = (lang: string) => {
+    }, []);
+    
+    const handleMenuClick = useCallback(() => {
+        setAnchorEl(null);
+    }, []);
+    
+    const setLang = useCallback((lang: string) => {
         localStorage.setItem("i18nextLng", lang);
         setCurrentLang(lang);
         i18next.changeLanguage(lang);
-    };
+    }, []);
+    
+    const handleChangeLangEn = useCallback(() => {
+        setLang("en");
+    }, [setLang]);
+    
+    const handleChangeLangPl = useCallback(() => {
+        setLang("pl");
+    }, [setLang]);
+    
     return (
         <div className="LanguageSelector">
-            <div className="LanguageSelector__main-button"  onClick={event => handleMainButtonClick(event.currentTarget)}>
+            <div className="LanguageSelector__main-button"  onClick={handleMainButtonClick}>
                 <div style={{ display: currentLang === "en" ? "block" : "none" }} className="LanguageSelector__combined-icon">
                     <US />
                     <GB />
@@ -43,8 +65,8 @@ export function LanguageSelector() {
             <Menu
                 anchorEl={anchorEl}
                 open={!!anchorEl}
-                onClose={handleClose}
-                onClick={handleClose}
+                onClose={handleMenuClose}
+                onClick={handleMenuClick}
                 disableScrollLock
                 PaperProps={{
                     elevation: 0,
@@ -78,23 +100,18 @@ export function LanguageSelector() {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
             >
-                <MenuItem selected={currentLang === "en"} onClick={() => setLang("en")}>
+                <MenuItem selected={currentLang === "en"} onClick={handleChangeLangEn}>
                     <ListItemIcon className="LanguageSelector__combined-icon">
                         <US />
                         <GB />
                     </ListItemIcon>
                 </MenuItem>
-                <MenuItem selected={currentLang === "pl"} onClick={() => setLang("pl")}>
+                <MenuItem selected={currentLang === "pl"} onClick={handleChangeLangPl}>
                     <ListItemIcon>
                         <PL />
                     </ListItemIcon>
                 </MenuItem>
             </Menu>
-            {/* <ul>
-                <li><GB /></li>
-                <li><US /></li>
-                <li><PL /></li>
-            </ul> */}
         </div>
     );
 }

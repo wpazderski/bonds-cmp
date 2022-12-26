@@ -1,15 +1,39 @@
-import Autocomplete from "@mui/material/Autocomplete";
+import "./Settings.scss";
+
+import Autocomplete, { AutocompleteRenderInputParams } from "@mui/material/Autocomplete";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
-import { FormEvent } from "react";
+import React, { FormEvent, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { NumericFormat } from "react-number-format";
-import { selectAdjustInterestRatePercentage, selectAmountToInvest, selectCurrency, selectInflationRates, selectInvestmentDuration, selectInvestmentIncomeTax, selectReferenceRates, setAdjustInterestRatePercentage, setAmountToInvest, setCurrency, setInflationRates, setInvestmentDuration, setInvestmentIncomeTax, setReferenceRates, useAppDispatch, useAppSelector } from "../../../app/store";
+import { NumberFormatValues, NumericFormat } from "react-number-format";
+
+import { Duration } from "../../../app/bonds";
+import {
+    selectAdjustInterestRatePercentage,
+    selectAmountToInvest,
+    selectCurrency,
+    selectInflationRates,
+    selectInvestmentDuration,
+    selectInvestmentIncomeTax,
+    selectReferenceRates,
+    setAdjustInterestRatePercentage,
+    setAmountToInvest,
+    setCurrency,
+    setInflationRates,
+    setInvestmentDuration,
+    setInvestmentIncomeTax,
+    setReferenceRates,
+    useAppDispatch,
+    useAppSelector,
+} from "../../../app/store";
 import { DurationInput } from "../../common/durationInput/DurationInput";
 import { NumberArrayInput, Preset } from "../../common/numberArrayInput/NumberArrayInput";
-import "./Settings.scss";
+
+
+
+
 
 function getCommonCurrencies() {
     return [
@@ -23,34 +47,35 @@ const inflationPresets: Preset[] = [
     {
         id: "low",
         name: "low",
-        values: [15, 7, 6, 5.5, 5, 4, 3, 2, 1, 1, ...new Array(110).fill(1)],
+        values: [8, 6, 4, 3, 2.5, 2.5, 2, 2, 1, 1, ...new Array(120).fill(1)],
     },
     {
         id: "medium",
         name: "medium",
-        values: [20, 10, 8, 5, 5, 4, 4, 3, 3, 3, ...new Array(110).fill(2.5)],
+        values: [12, 9, 6, 5, 5, 4, 4, 3, 3, 3, ...new Array(120).fill(2.5)],
     },
     {
         id: "high",
         name: "high",
-        values: [25, 20, 17, 15, 10, 7, 6, 5, 4.5, 4.5, ...new Array(110).fill(4)],
+        values: [25, 20, 17, 15, 10, 7, 6, 5, 4.5, 4.5, ...new Array(120).fill(4)],
     },
 ];
+
 const referenceRatesPresets: Preset[] = [
     {
         id: "low",
         name: "low",
-        values: [ 5, 4.5, 4, 4, 3.5, 3, 2, 1.5, 1.5, 1, ...new Array(110).fill(1)],
+        values: [ 5, 4.5, 4, 4, 3.5, 3, 2, 1.5, 1.5, 1, ...new Array(120).fill(1)],
     },
     {
         id: "medium",
         name: "medium",
-        values: [ 9, 7, 4, 2, 2, 2, 1, 1, 1, 1, ...new Array(110).fill(2)],
+        values: [ 9, 7, 4, 2, 2, 2, 1, 1, 1, 1, ...new Array(120).fill(2)],
     },
     {
         id: "high",
         name: "high",
-        values: [ 12, 10, 8, 8, 7, 7, 6, 5, 4.5, 4.5, ...new Array(110).fill(4)],
+        values: [ 12, 10, 8, 8, 7, 7, 6, 5, 4.5, 4.5, ...new Array(120).fill(4)],
     },
 ];
 
@@ -65,51 +90,99 @@ export function Settings() {
     const inflationRates = useAppSelector(selectInflationRates);
     const referenceRates = useAppSelector(selectReferenceRates);
     
+    // Currency
+    const renderCurrencyInput = useCallback((params: AutocompleteRenderInputParams) => {
+        return <TextField {...params} label={t("settings.field.currency")} />;
+    }, [t]);
+    const handleCurrencyChange = useCallback((_event: React.SyntheticEvent, value: string | { label: string } | null) => {
+        const valueStr = typeof(value) === "string" ? value : (value ? value.label : ""); 
+        dispatch(setCurrency(valueStr));
+    }, [dispatch]);
+    const handleCurrencyInput = useCallback((event: FormEvent<HTMLInputElement>) => {
+        dispatch(setCurrency((event.target as HTMLInputElement).value));
+    }, [dispatch]);
+    
+    // Amount to invest
+    const isAmountToInvestAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue === undefined || (values.floatValue >= 100 && values.floatValue <= 1000000000);
+    }, []);
+    const handleAmountToInvestChange = useCallback((value: NumberFormatValues) => {
+        dispatch(setAmountToInvest(value.floatValue ?? 0));
+    }, [dispatch]);
+    
+    const handleInvestmentDurationChange = useCallback((value: Duration) => {
+        dispatch(setInvestmentDuration(value));
+    }, [dispatch]);
+    
+    // Investment income tax
+    const isInvestmentIncomeTaxAllowed = useCallback((values: NumberFormatValues) => {
+        return values.floatValue === undefined || (values.floatValue >= 0 && values.floatValue <= 100);
+    }, []);
+    const handleInvestmentIncomeTaxChange = useCallback((value: NumberFormatValues) => {
+        dispatch(setInvestmentIncomeTax(value.floatValue ?? 0));
+    }, [dispatch]);
+    
+    // Interest rate percentage adjustment
+    const handleAdjustInterestRatePercentageChange = useCallback((value: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch(setAdjustInterestRatePercentage(value.target.checked));
+    }, [dispatch]);
+    
+    // Inflation rates
+    const handleInflationRatesChange = useCallback((value: number[]) => {
+        dispatch(setInflationRates(value));
+    }, [dispatch]);
+    
+    // Reference rates
+    const handleReferenceRatesChange = useCallback((value: number[]) => {
+        dispatch(setReferenceRates(value));
+    }, [dispatch]);
+    
     return (
         <div className="Settings">
             <Stack spacing={2} className="Settings__form">
                 <Autocomplete
                     freeSolo
                     options={getCommonCurrencies()}
-                    renderInput={params => <TextField {...params} label={t("settings.field.currency")} />}
+                    renderInput={renderCurrencyInput}
                     value={currency}
-                    onChange={(_, value) => dispatch(setCurrency(typeof(value) === "string" ? value : (value ? value.label : "")))}
-                    onInput={(event: FormEvent<HTMLInputElement>) => dispatch(setCurrency((event.target as any).value))}
+                    onChange={handleCurrencyChange}
+                    onInput={handleCurrencyInput}
                 ></Autocomplete>
                 <NumericFormat
                     thousandSeparator=" "
                     suffix={` ${currency}`}
                     label={t("settings.field.amountToInvest")}
-                    isAllowed={values => values.floatValue === undefined || (values.floatValue >= 100 && values.floatValue <= 1000000000)}
+                    isAllowed={isAmountToInvestAllowed}
                     decimalScale={0}
                     customInput={TextField}
                     allowNegative={false}
                     value={amountToInvest}
-                    onValueChange={value => dispatch(setAmountToInvest(value.floatValue ?? 0))}
+                    onValueChange={handleAmountToInvestChange}
                 />
                 <DurationInput
                     label={t("settings.field.investmentDuration")}
                     value={investmentDuration}
-                    onValueChange={value => dispatch(setInvestmentDuration(value))}
+                    maxMonths={50 * 12}
+                    onValueChange={handleInvestmentDurationChange}
                 />
                 <NumericFormat
                     thousandSeparator=" "
                     decimalSeparator="."
                     suffix={"%"}
                     label={t("settings.field.investmentIncomeTax")}
-                    isAllowed={values => values.floatValue === undefined || (values.floatValue >= 0 && values.floatValue <= 100)}
+                    isAllowed={isInvestmentIncomeTaxAllowed}
                     decimalScale={2}
                     customInput={TextField}
                     allowNegative={false}
                     value={investmentIncomeTax}
-                    onValueChange={value => dispatch(setInvestmentIncomeTax(value.floatValue ?? 0))}
+                    onValueChange={handleInvestmentIncomeTaxChange}
                 />
                 <div className="Settings__separate-option">
                     <FormControlLabel
                         control={
                             <Switch
                                 checked={adjustInterestRatePercentage}
-                                onChange={value => dispatch(setAdjustInterestRatePercentage(value.target.checked))}
+                                onChange={handleAdjustInterestRatePercentageChange}
                             />
                         }
                         label={t("settings.field.adjustInterestRatePercentage")}
@@ -126,7 +199,7 @@ export function Settings() {
                     <NumberArrayInput
                         label={t("settings.field.inflationRates")}
                         value={inflationRates}
-                        onValueChange={value => dispatch(setInflationRates(value))}
+                        onValueChange={handleInflationRatesChange}
                         forDuration={investmentDuration}
                         suffix={"%"}
                         min={-1000}
@@ -138,7 +211,7 @@ export function Settings() {
                     <NumberArrayInput
                         label={t("settings.field.referenceRates")}
                         value={referenceRates}
-                        onValueChange={value => dispatch(setReferenceRates(value))}
+                        onValueChange={handleReferenceRatesChange}
                         forDuration={investmentDuration}
                         suffix={"%"}
                         min={-1000}

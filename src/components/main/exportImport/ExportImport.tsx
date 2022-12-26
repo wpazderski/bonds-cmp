@@ -1,56 +1,73 @@
-import { useState } from "react";
+import "./ExportImport.scss";
+
+import { faCopy, faDownload, faSave, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import TextField from "@mui/material/TextField";
+import { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faDownload, faSave, faTrash, faUpload } from "@fortawesome/free-solid-svg-icons";
-import { ExportImport as ExportImportUtils } from "../../../app/store/ExportImport";
+
 import { selectBonds, selectSettings, setBonds, setSettings, useAppDispatch, useAppSelector } from "../../../app/store";
-import "./ExportImport.scss";
+import { ExportImport as ExportImportUtils } from "../../../app/store/ExportImport";
+
+
+
+
 
 export function ExportImport() {
     const { t } = useTranslation();
-    const [successSnackbarText, setSuccessSnackbarText] = useState("");
     const dispatch = useAppDispatch();
+    const [successSnackbarText, setSuccessSnackbarText] = useState("");
     const settings = useAppSelector(selectSettings);
     const bonds = useAppSelector(selectBonds);
-    const sharedUrl = ExportImportUtils.exportToUrl(getDataForExport());
-    function getDataForExport() {
+    
+    const getDataForExport = useCallback(() => {
         return {
             bonds: bonds,
             settings: settings,
         };
-    }
-    const handleSuccessSnackbarClose = () => {
+    }, [bonds, settings]);
+    
+    const sharedUrl = useMemo(() => {
+        return ExportImportUtils.exportToUrl(getDataForExport());
+    }, [getDataForExport]);
+    
+    const handleSuccessSnackbarClose = useCallback(() => {
         setSuccessSnackbarText("");
-    };
-    const handleSaveDataClick = () => {
-        ExportImportUtils.saveToLocalStorage(getDataForExport());
+    }, []);
+    
+    const handleSaveDataClick = useCallback(() => {
+        ExportImportUtils.saveDataToLocalStorage(getDataForExport());
         setSuccessSnackbarText(t("exportImport.save.messages.saved"));
-    };
-    const handleClearDataClick = () => {
-        ExportImportUtils.removeFromLocalStorage();
+    }, [getDataForExport, t]);
+    
+    const handleClearDataClick = useCallback(() => {
+        ExportImportUtils.removeDataFromLocalStorage();
         setSuccessSnackbarText(t("exportImport.save.messages.cleared"));
-    };
-    const handleExportDataClick = () => {
-        ExportImportUtils.export(getDataForExport());
+    }, [t]);
+    
+    const handleExportDataClick = useCallback(() => {
+        ExportImportUtils.exportToFile(getDataForExport());
         setSuccessSnackbarText(t("exportImport.export.messages.exported"));
-    };
-    const handleImportFileChange = async (files: FileList | null) => {
+    }, [getDataForExport, t]);
+    
+    const handleImportFileChange = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
         if (!files || files.length !== 1) {
             return;
         }
-        const data = await ExportImportUtils.import(files[0]);
+        const data = await ExportImportUtils.readFromFile(files[0]);
         dispatch(setSettings(data.settings));
         dispatch(setBonds(data.bonds));
         setSuccessSnackbarText(t("exportImport.import.messages.imported"));
-    };
-    const handleCopyUrlClick = () => {
-        ExportImportUtils.copyUrl(sharedUrl);
+    }, [dispatch, t]);
+    
+    const handleCopyUrlClick = useCallback(() => {
+        navigator.clipboard.writeText(sharedUrl);
         setSuccessSnackbarText(t("exportImport.share.messages.copied"));
-    };
+    }, [sharedUrl, t]);
     
     return (
         <div className="ExportImport">
@@ -61,7 +78,7 @@ export function ExportImport() {
                     <Button
                         variant="contained"
                         startIcon={<FontAwesomeIcon icon={faSave} />}
-                        onClick={() => handleSaveDataClick()}
+                        onClick={handleSaveDataClick}
                         sx={{ margin: "10px 10px 10px 0" }}
                     >
                         {t("exportImport.save.buttons.save")}
@@ -70,7 +87,7 @@ export function ExportImport() {
                         variant="outlined"
                         color="warning"
                         startIcon={<FontAwesomeIcon icon={faTrash} />}
-                        onClick={() => handleClearDataClick()}
+                        onClick={handleClearDataClick}
                         sx={{ margin: "10px 10px 10px 0" }}
                     >
                         {t("exportImport.save.buttons.clear")}
@@ -84,7 +101,7 @@ export function ExportImport() {
                     <Button
                         variant="contained"
                         startIcon={<FontAwesomeIcon icon={faDownload} />}
-                        onClick={() => handleExportDataClick()}
+                        onClick={handleExportDataClick}
                         sx={{ margin: "10px 10px 10px 0" }}
                     >
                         {t("exportImport.export.buttons.export")}
@@ -105,7 +122,7 @@ export function ExportImport() {
                         <input
                             type="file"
                             hidden
-                            onChange={event => handleImportFileChange(event.target.files)}
+                            onChange={handleImportFileChange}
                         />
                     </Button>
                 </div>
@@ -117,7 +134,7 @@ export function ExportImport() {
                     <Button
                         variant="contained"
                         startIcon={<FontAwesomeIcon icon={faCopy} />}
-                        onClick={() => handleCopyUrlClick()}
+                        onClick={handleCopyUrlClick}
                         sx={{ margin: "10px 10px 10px 0" }}
                     >
                         {t("exportImport.share.buttons.copy")}

@@ -1,9 +1,13 @@
 import Grid from "@mui/material/Unstable_Grid2";
-import { BondsList } from "./bondsList/BondsList";
-import "./Bonds.scss";
-import { BondsForm } from "./bondsForm/BondsForm";
+
 import { selectAvailableBonds, useAppSelector } from "../../../app/store";
 import { selectOpenBondsId } from "../../../app/store/UiSlice";
+import { BondsForm } from "./bondsForm/BondsForm";
+import { BondsList } from "./bondsList/BondsList";
+
+
+
+
 
 export function Bonds() {
     const availableBonds = useAppSelector(selectAvailableBonds);

@@ -1,15 +1,32 @@
-import { useMemo, useRef } from "react";
-import Button from "@mui/material/Button";
-import { useTranslation } from "react-i18next";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import "./Chart.scss";
+
 import { faExpand } from "@fortawesome/free-solid-svg-icons";
-import { selectAvailableBonds, selectSettings, useAppSelector } from "../../../../app/store";
-import { Bonds, Calculator } from "../../../../app/bonds";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Button from "@mui/material/Button";
+import {
+    CategoryScale,
+    Chart as ChartJS,
+    ChartData,
+    ChartOptions,
+    Legend,
+    LinearScale,
+    LineElement,
+    PointElement,
+    Title,
+    Tooltip,
+} from "chart.js";
+import { useCallback, useMemo, useRef } from "react";
 import { Line as LineChart } from "react-chartjs-2";
-import {  Chart as ChartJS, ChartData, ChartOptions, CategoryScale, LineElement, LinearScale, PointElement, Title, Tooltip, Legend } from "chart.js";
+import { useTranslation } from "react-i18next";
+
+import { Bonds, Calculator } from "../../../../app/bonds";
+import { selectAvailableBonds, selectSettings, useAppSelector } from "../../../../app/store";
 import { Utils } from "../../../../app/Utils";
 import { ChartColors } from "./ChartColors";
-import "./Chart.scss";
+
+
+
+
 
 ChartJS.register(
     CategoryScale,
@@ -60,9 +77,6 @@ export function Chart(props: ChartProps) {
     const chartContainer = useRef<HTMLDivElement>(null);
     const availableBonds = useAppSelector(selectAvailableBonds);
     const settings = useAppSelector(selectSettings);
-    const handleOpenFullScreenClick = () => {
-        chartContainer.current?.requestFullscreen();
-    }; 
     const onlyEarnings = props.chartId === "onlyEarnings" || props.chartId === "onlyEarningsAdjustedForInflation";
     const adjustedForInflation = props.chartId === "totalAdjustedForInflation" || props.chartId === "onlyEarningsAdjustedForInflation";
     
@@ -106,6 +120,10 @@ export function Chart(props: ChartProps) {
         };
     }, [labels, datasets]);
     
+    const handleOpenFullScreenClick = useCallback(() => {
+        chartContainer.current?.requestFullscreen();
+    }, []);
+    
     return (
         <section className="Chart">
             <h3>
@@ -114,7 +132,7 @@ export function Chart(props: ChartProps) {
                     variant="outlined"
                     size="small"
                     startIcon={<FontAwesomeIcon icon={faExpand}/>}
-                    onClick={() => handleOpenFullScreenClick()}
+                    onClick={handleOpenFullScreenClick}
                 >
                     {t("charts.openFullScreen")}
                 </Button>
